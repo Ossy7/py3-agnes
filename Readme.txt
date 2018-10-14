@@ -1,10 +1,10 @@
 Agnes
-Version: 1.3.3
+Version: 1.3.4
 
 DESCRIPTION
 
-Agnes is a script written in Python3 and compatible with python2.
-It is an analyses of your database table (mysql-mariaDB, postgresql).
+Agnes is a script written in Python. Agnes has been tested on postgresql and mysql. Feel free to test it on any other database included in its functions.
+It is an analyses, statistics, wrangling of your database table (mysql, postgresql, oracle, mssql, sqlite ).
 Agnes is dedicated to my mother for her unfailing love and encouragement.
 Agnes has the potential to run on most devices with little or no effort.
 
@@ -21,6 +21,6 @@ Developer
 Daniel Osinachi N.
 
 Date
-05-10-2018.
+14-10-2018.
 
 
