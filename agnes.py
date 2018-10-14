@@ -1,37 +1,66 @@
-import sys
-from optparse import OptionParser
-import MySQLdb
-import psycopg2
+# Database analyses for all databases
+from sqlalchemy import create_engine
 import pandas as pd
-__version__ = "1.3.3"
+__version__ = "1.3.4"
 
 #connect to mysql       
 def myconnect(uname, passw, host_name, db_name, tb_name):
     try:
-        mcon = MySQLdb.connect(host=host_name, user=uname, passwd=passw, db=db_name)
-        try:
-            sq_tb = pd.read_sql('select * from '+ ' %s ' % tb_name, mcon)
-            df = pd.DataFrame(sq_tb)
-            mcon.close()
-            db_analyses(df)
-        except Exception:
-            print("Ensure that table name is correct")
+        mcon = create_engine("mysql+mysqldb://"+"%s"%uname+":"+"%s"%passw+"@"+"%s"%host_name+"/"+"%s"%db_name)
+        sq_tb = pd.read_sql('%s' %tb_name, mcon)
     except Exception:
-        print("Ensure connection details re correct.")
+        print("Ensure connections details are correct.")
+        return
+    df1 = pd.DataFrame(sq_tb)
+    return df1
         
 #connect to postgresql    
 def pconnect(uname, passw, host_name, db_name, tb_name):
     try:
-        pcon = psycopg2.connect("host ="+"%s" %host_name + " user ="+"%s" %uname + " password ="+"%s" %passw + " dbname ="+"%s" %db_name)
-        try:
-            ptable = pd.read_sql('select * from '+ ' %s ' % tb_name, pcon)
-            df = pd.DataFrame(ptable)
-            pcon.close()
-            db_analyses(df)
-        except Exception:
-            print("Ensure table name is correct.")
+        pcon = create_engine("postgresql://"+"%s"%uname+":"+"%s"%passw+"@"+"%s"%host_name+":5432/"+"%s"%db_name)
+        ptable = pd.read_sql('select * from '+ ' %s ' % tb_name, pcon)
     except Exception:
-        print("Ensure connection details re accurate.")
+        print("Ensure connections details are correct")
+        return
+    df2 = pd.DataFrame(ptable)
+    return df2
+        
+#connect to oracle
+def oconnector(uname, passw, host_name, db_name, tb_name):
+    try:
+        ocon = create_engine("oracle://"+"%s"%uname+":"+"%s"%passw+"@"+"%s"%host_name+":1521/"+"%s"%db_name)
+        otable = pd.read_sql("%s" %tb_name, ocon)
+    except Exception:
+        print("Ensure connections details are correct.")
+        return
+    df3 = pd.DataFrame(otable)
+    return df3
+
+#connect to mssql
+def mss_connector(db_name, tb_name):
+    try:
+        mss = create_engine("mssql+pyodbc://"+"%s"%db_name)
+        mss_table = pd.read_sql("%s" %tb_name, mss)
+    except Exception:
+        print("Ensure connection details are correct.")
+        return
+    df4 = pd.DataFrame(mss_table)
+    return df4
+
+#connect to sqlite
+def mylite(db_name, tb_name):
+    try:
+        slite = create_engine("sqlite:///"+"%s"%db_name+".db")
+        lite_tb = pd.read_sql("%s" %tb_name, slite)
+    except Exception:
+        print("Ensure connection details are correct.")
+        return
+    df5 = pd.DataFrame(lite_tb)
+    return df5
+
+#save to excel sheet
+def saver(df):
+    return df.to_excel('agTable.xlsx')
         
 #data analyses
 def db_analyses(df):
@@ -45,35 +74,9 @@ def db_analyses(df):
     print("Summation: %s" %df.sum())
     print("Maximum: %s" %df.max())
     print("Minimum: %s" %df.min())
+    #df.to_excel('db_table.xlsx')
     
-if __name__ == '__main__':
-    parser = OptionParser("usage%prog -u <username> -p <password> -s <host> -d <database> -t <table name>")                     
-    parser.add_option("-u", "--uname", dest="uname", help="USER for db", metavar="UNAME")                 
-    parser.add_option("-p", "--passw", dest="passw", help="PASSWORD for db", metavar="PASSW")                 
-    parser.add_option("-s", "--host_name", dest="host_name", default="localhost", help="HOST for db", metavar="HOST_NAME")
-    parser.add_option("-d", "--db_name", dest="db_name", help="DATABASE name", metavar="DB_NAME")                 
-    parser.add_option("-t", "--tb_name", dest="tb_name", help="TABLE name", metavar="TB_NAME")                 
-    (options, args) = parser.parse_args()
-    if options.uname and options.passw and options.host_name and options.db_name and options.tb_name:
-        print('options: %s, args: %s' %(options, args))
-        #python2
-        #db_options = raw_input("Enter database: mysql, postgres, or quit: ")
-        db_options = input("Enter database: mysql, postgres, or quit: ")
-        if db_options == "mysql":
-            my_connector = myconnect(options.uname, options.passw, options.host_name, options.db_name, options.tb_name)
-        elif db_options == "postgres":
-            my_pconnector = pconnect(options.uname, options.passw, options.host_name, options.db_name, options.tb_name)
-        elif db_options == "quit" or "q":
-            sys.exit()
-    else:
-        print(parser.usage)
-        #exit(0)
-        
-        
-        
-        
-    
-    
-    
-    
-    
+#combine two database tables    
+def merger(df1, df2):
+    df_meg = pd.merge(df1, df2)
+    return df_meg
