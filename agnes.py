@@ -1,8 +1,7 @@
 # Database analyses for all databases
-import os
 from sqlalchemy import create_engine
 import pandas as pd
-__version__ = "1.3.5"
+__version__ = "1.3.6"
 
 #connect to mysql       
 def myconnect(uname, passw, host_name, db_name, tb_name):
@@ -61,16 +60,9 @@ def mylite(db_name, tb_name):
 
 #save db table to excel sheet 
 def saver(df):
-    xname = 'agTable'
-    count = 0
-    for filename in os.listdir('.'):
-        if filename.startswith(xname):
-            count += 1
-            xname = xname+ '%s' %count 
-            df.to_excel(xname+'.xlsx')
-        else:
-            df.to_excel(xname+'.xlsx')
-
+    fname = input("Enter name to save: ")
+    fs = df.to_excel(fname +'.xlsx')
+    
         
 #data analyses
 def db_analyses(df):
@@ -84,7 +76,7 @@ def db_analyses(df):
     print("Summation: %s" %df.sum())
     print("Maximum: %s" %df.max())
     print("Minimum: %s" %df.min())
-
+    #df.to_excel('db_table.xlsx')
     
 #combine two database tables    
 def merger(df1, df2):
