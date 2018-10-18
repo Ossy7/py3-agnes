@@ -1,7 +1,8 @@
 # Database analyses for all databases
+import os
 from sqlalchemy import create_engine
 import pandas as pd
-__version__ = "1.3.6"
+__version__ = "1.3.7"
 
 #connect to mysql       
 def myconnect(uname, passw, host_name, db_name, tb_name):
@@ -58,11 +59,15 @@ def mylite(db_name, tb_name):
     df5 = pd.DataFrame(lite_tb)
     return df5
 
-#save db table to excel sheet 
+#save db table to excel sheet, prompts user for new name if filename already exists 
 def saver(df):
     fname = input("Enter name to save: ")
-    fs = df.to_excel(fname +'.xlsx')
-    
+    xname = fname +'.xlsx'
+    if not os.path.isfile(xname):
+        fs = df.to_excel(xname)
+    else:
+        print("[*] %s already exists..." %xname)
+        return saver(df)
         
 #data analyses
 def db_analyses(df):
