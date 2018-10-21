@@ -2,7 +2,7 @@
 import os
 from sqlalchemy import create_engine
 import pandas as pd
-__version__ = "1.3.7"
+__version__ = "1.3.8"
 
 #connect to mysql       
 def myconnect(uname, passw, host_name, db_name, tb_name):
@@ -59,14 +59,18 @@ def mylite(db_name, tb_name):
     df5 = pd.DataFrame(lite_tb)
     return df5
 
-#save db table to excel sheet, prompts user for new name if filename already exists 
+#save db table to excel, csv, json sheet, prompts user for new name if name already exists 
 def saver(df):
     fname = input("Enter name to save: ")
-    xname = fname +'.xlsx'
+    xname, cname, jname = fname +'.xlsx', fname + '.csv', fname+ '.json'
     if not os.path.isfile(xname):
         fs = df.to_excel(xname)
-    else:
-        print("[*] %s already exists..." %xname)
+    elif not os.path.isfile(cname):
+        fs = df.to_csv(cname)
+    elif not os.path.isfile(jname):
+        fs = df.to_json(jname)
+    else: 
+        print("[*] %s, %s, %s already exists..." %(xname, cname, jname))
         return saver(df)
         
 #data analyses
@@ -81,7 +85,6 @@ def db_analyses(df):
     print("Summation: %s" %df.sum())
     print("Maximum: %s" %df.max())
     print("Minimum: %s" %df.min())
-    #df.to_excel('db_table.xlsx')
     
 #combine two database tables    
 def merger(df1, df2):
